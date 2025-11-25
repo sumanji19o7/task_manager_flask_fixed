@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="layout-grid">
+    <section class="card card-glass">
+        <h1 class="title">Plan your day</h1>
+        <p class="subtitle">
+            Add tasks, set gentle deadlines, and keep your focus clear.
+        </p>
+
+        <form method="POST" class="task-form">
+            <div class="form-row">
+                <label for="title">Task title</label>
+                <input type="text" id="title" name="title" placeholder="Write a clear, simple task..." required />
+            </div>
+            <div class="form-row">
+                <label for="description">Description <span class="optional">(optional)</span></label>
+                <textarea id="description" name="description" rows="3" placeholder="Add a few helpful details..."></textarea>
+            </div>
+            <div class="form-inline">
+                <div class="form-row">
+                    <label for="due_date">Due date</label>
+                    <input type="date" id="due_date" name="due_date" />
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-glow"></span>
+                    <span class="btn-text">Add task</span>
+                </button>
+            </div>
+        </form>
+
+        <div class="hint">
+            Pro tip: group tasks by what you can finish in under 25 minutes.
+        </div>
+    </section>
+
+    <section class="card card-glass">
+        <div class="tasks-header">
+            <h2>Your tasks</h2>
+            <form method="GET" class="filters">
+                <select name="status" onchange="this.form.submit()">
+                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                    <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                </select>
+                <select name="sort" onchange="this.form.submit()">
+                    <option value="created_at" {% if sort == 'created_at' %}selected{% endif %}>Newest</option>
+                    <option value="due_date" {% if sort == 'due_date' %}selected{% endif %}>Due date</option>
+                    <option value="title" {% if sort == 'title' %}selected{% endif %}>Title</option>
+                </select>
+            </form>
+        </div>
+
+        {% if tasks %}
+            <ul class="task-list">
+                {% for task in tasks %}
+                    <li class="task-item {% if task.completed %}task-completed{% endif %}">
+                        <div class="task-main">
+                            <form method="POST" action="{{ url_for('complete_task', task_id=task.id) }}">
+                                <button class="check-circle" type="submit" title="Toggle complete">
+                                    <span class="check-inner"></span>
+                                </button>
+                            </form>
+                            <div class="task-text">
+                                <div class="task-title-row">
+                                    <h3>{{ task.title }}</h3>
+                                    {% if task.due_date %}
+                                        <span class="badge badge-soft">
+                                            Due {{ task.due_date.strftime('%d %b %Y') }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                {% if task.description %}
+                                    <p class="task-desc">{{ task.description }}</p>
+                                {% endif %}
+                                <span class="task-meta">
+                                    Added {{ task.created_at.strftime('%d %b %Y, %H:%M') }}
+                                    {% if task.completed %}• Completed{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('delete_task', task_id=task.id) }}" onsubmit="return confirmDelete();">
+                            <button class="btn-icon" type="submit" title="Delete task">✕</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <form method="POST" action="{{ url_for('clear_completed') }}" onsubmit="return confirmClearCompleted();">
+                <button type="submit" class="btn btn-ghost">Clear completed tasks</button>
+            </form>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🌙</div>
+                <h3>No tasks yet</h3>
+                <p>Add your first task to get started.</p>
+            </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

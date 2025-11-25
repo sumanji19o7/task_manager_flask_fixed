@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CalmTasks - Simple Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-orbit orbit-1"></div>
+    <div class="bg-orbit orbit-2"></div>
+    <div class="bg-orbit orbit-3"></div>
+
+    <header class="app-header">
+        <div class="logo">
+            <span class="logo-icon">✓</span>
+            <span class="logo-text">CalmTasks</span>
+        </div>
+        <div class="header-right">
+            <span class="pill pill-soft">made by love</span>
+            <span class="pill pill-accent">Task Manager</span>
+        </div>
+    </header>
+
+    <main class="app-main">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="app-footer">
+        <span>Built with ❤️  using Flask</span>
+        <span>shiven malik</span>
+    </footer>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
